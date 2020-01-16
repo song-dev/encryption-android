@@ -17,7 +17,15 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        native-lib.cpp)
+        native-lib.cpp
+        sm4/cbc128.c
+        sm4/sms4_cbc.c
+        sm4/sms4_enc.c
+        sm4/sms4_common.c
+        sm4/sms4_setkey.c
+#        sm4/sms4_ede.c
+#        sm4/sms4_ofb.c
+        )
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by

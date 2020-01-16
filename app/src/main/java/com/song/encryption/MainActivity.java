@@ -1,11 +1,14 @@
 package com.song.encryption;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "MainActivity";
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -20,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
         // Example of a call to a native method
         TextView tv = findViewById(R.id.sample_text);
         tv.setText(stringFromJNI());
+
+        Log.e(TAG, "onCreate: " + geetest_enc("sss".getBytes()));
+        Log.e(TAG, "onCreate: " + geetest_dec("sss"));
     }
 
     /**
@@ -27,4 +33,8 @@ public class MainActivity extends AppCompatActivity {
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+
+    public native String geetest_enc(byte[] data);
+
+    public native String geetest_dec(String data);
 }

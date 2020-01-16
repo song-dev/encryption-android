@@ -12,9 +12,16 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++11"
+                cppFlags "-fvisibility=hidden  -ffunction-sections -fdata-sections -std=c++11 -fno-rtti -fno-exceptions"
+                arguments "-DANDROID_STL=none"
+                cFlags "-fvisibility=hidden  -ffunction-sections -fdata-sections"
+            }
+
+            ndk {
+                abiFilters "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
             }
         }
+
     }
     buildTypes {
         release {
