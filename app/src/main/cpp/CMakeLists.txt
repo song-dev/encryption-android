@@ -23,8 +23,10 @@ add_library( # Sets the name of the library.
         sm4/sms4_enc.c
         sm4/sms4_common.c
         sm4/sms4_setkey.c
-#        sm4/sms4_ede.c
-#        sm4/sms4_ofb.c
+        sm2/sm2_crypt.c
+        sm2/sm2_err.c
+        sm2/sm2_pmeth.c
+        sm2/sm2_sign.c
         )
 
 # Searches for a specified prebuilt library and stores the path as a
