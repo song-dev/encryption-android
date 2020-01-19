@@ -1,5 +1,7 @@
 package com.song.encryption;
 
+import com.song.encryption.sm4.SM4Util;
+
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.junit.Assert;
 import org.junit.Test;

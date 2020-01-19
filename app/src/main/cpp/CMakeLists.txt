@@ -26,7 +26,11 @@ add_library( # Sets the name of the library.
         sm2/sm2_crypt.c
         sm2/sm2_err.c
         sm2/sm2_pmeth.c
-        sm2/sm2_sign.c
+        sm2/tasn_dec.c
+        sm2/tasn_new.c
+        sm2/ec_key.c
+        sm2/tasn_enc.c
+        sm2/tasn_fre.c
         )
 
 # Searches for a specified prebuilt library and stores the path as a

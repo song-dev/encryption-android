@@ -17,6 +17,8 @@
 extern "C" {
 # endif
 
+#define OPENSSL_API_LEVEL 1000
+
 /*
  * SECTION 1: VERSION DATA.  These will change for each release
  */
@@ -106,7 +108,7 @@ extern "C" {
 # endif
 
 //# include <openssl/macros.h>
-# include "macros.h"
+//# include "macros.h"
 # ifndef OPENSSL_NO_DEPRECATED_3_0
 #  define HEADER_OPENSSLV_H
 # endif

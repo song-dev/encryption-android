@@ -13,7 +13,7 @@
 # pragma once
 
 //# include <openssl/macros.h>
-# include "macros.h"
+//# include "macros.h"
 # ifndef OPENSSL_NO_DEPRECATED_3_0
 #  define HEADER_BN_H
 # endif
@@ -34,6 +34,8 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
+
+#define SIXTY_FOUR_BIT_LONG
 
 /*
  * 64-bit processor with LP64 ABI
@@ -202,6 +204,8 @@ int BN_is_odd(const BIGNUM *a);
 # define BN_one(a)       (BN_set_word((a),1))
 
 void BN_zero_ex(BIGNUM *a);
+
+#define OPENSSL_API_LEVEL 1000
 
 # if OPENSSL_API_LEVEL > 908
 #  define BN_zero(a)      BN_zero_ex(a)

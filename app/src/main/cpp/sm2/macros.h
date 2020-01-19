@@ -68,9 +68,9 @@
  * macros are used to enable or disable features at that API version boundary.
  */
 
-# ifdef OPENSSL_API_LEVEL
-#  error "OPENSSL_API_LEVEL must not be defined by application"
-# endif
+//# ifdef OPENSSL_API_LEVEL
+////#  error "OPENSSL_API_LEVEL must not be defined by application"
+////# endif
 
 /*
  * We figure out what API level was intended by simple numeric comparison.
@@ -102,17 +102,17 @@
 #  endif
 # endif
 
-# if OPENSSL_API_LEVEL > OPENSSL_CONFIGURED_API
-#  error "The requested API level higher than the configured API compatibility level"
-# endif
+//# if OPENSSL_API_LEVEL > OPENSSL_CONFIGURED_API
+//#  error "The requested API level higher than the configured API compatibility level"
+//# endif
 
 /*
  * Check of sane values.
  */
 /* Can't go higher than the current version. */
-# if OPENSSL_API_LEVEL > (OPENSSL_VERSION_MAJOR * 10000 + OPENSSL_VERSION_MINOR * 100)
-#  error "OPENSSL_API_COMPAT expresses an impossible API compatibility level"
-# endif
+//# if OPENSSL_API_LEVEL > (OPENSSL_VERSION_MAJOR * 10000 + OPENSSL_VERSION_MINOR * 100)
+//#  error "OPENSSL_API_COMPAT expresses an impossible API compatibility level"
+//# endif
 /* OpenSSL will have no version 2.y.z */
 # if OPENSSL_API_LEVEL < 30000 && OPENSSL_API_LEVEL >= 20000
 #  error "OPENSSL_API_COMPAT expresses an impossible API compatibility level"
