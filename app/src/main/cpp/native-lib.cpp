@@ -11,7 +11,7 @@
 typedef struct DP_BYTES {
     int length;
     char *data;
-};
+}DP_BYTES;
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_song_encryption_MainActivity_stringFromJNI(
@@ -36,7 +36,7 @@ unsigned char *test_sm2_encrypto(struct DP_BYTES data, struct DP_BYTES publicKey
     }
 
     // 打印加密后长度
-    LOGD("len_out: %u", len_out);
+    LOGD("len_out: %lu", len_out);
     for (int i = 0; i < len_out; ++i) {
         LOGD("test_sm2_encrypto: %.2x", result[i]);
     }
@@ -69,8 +69,8 @@ unsigned char *test_sm2_decrypto(struct DP_BYTES cipherText, struct DP_BYTES pri
     memset(&result, 0, out_len);
     memset(&pass, 0, pass_len);
 
-    LOGD("decrypted len: %u", out_len);
-    LOGD("pass len: %u", pass_len);
+    LOGD("decrypted len: %lu", out_len);
+    LOGD("pass len: %lu", pass_len);
 
     pass[0] = '\x04'; //需要补一位\x04
     memcpy(pass + 1, cipherText.data, cipherText.length);
@@ -242,7 +242,7 @@ Java_com_song_encryption_MainActivity_geetest_1dec(JNIEnv *env, jobject instance
     unsigned char in[len_ext];
     memcpy(in, origin, len_ext);
 
-    LOGD("dec len: %d dec origin len: %d", len_ext, len_dec);
+    LOGD("dec len: %zu dec origin len: %zu", len_ext, len_dec);
     for (int i = 0; i < len_ext; ++i) {
         LOGD("dec in: %.2x", in[i]);
     }
