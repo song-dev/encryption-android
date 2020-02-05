@@ -13,7 +13,8 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-fvisibility=hidden  -ffunction-sections -fdata-sections -std=c++11 -fno-rtti -fno-exceptions"
-                arguments "-DANDROID_STL=none"
+                arguments "-DANDROID_STL=c++_shared"
+//                arguments "-DANDROID_STL=none"
                 cFlags "-fvisibility=hidden  -ffunction-sections -fdata-sections"
             }
 
@@ -33,6 +34,10 @@ android {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
         }
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 

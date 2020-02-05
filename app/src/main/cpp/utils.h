@@ -9,4 +9,6 @@
 
 void print_long_data(char *s);
 
+void hexstrToByte(const char *source, char *dest, int sourceLen);
+
 #endif //ENCRYPTION_ANDROID_UTILS_H

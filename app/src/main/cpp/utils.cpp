@@ -3,6 +3,7 @@
 //
 
 #include <string.h>
+#include <ctype.h>
 #include "utils.h"
 #include "log.h"
 
@@ -30,4 +31,28 @@ void print_long_data(char *s) {
         LOGE("%s", s);
     }
 
+}
+
+void hexstrToByte(const char *source, char *dest, int sourceLen) {
+
+    int i;
+    unsigned char highByte, lowByte;
+
+    for (i = 0; i < sourceLen; i += 2) {
+        highByte = toupper(source[i]);
+        lowByte = toupper(source[i + 1]);
+
+        if (highByte > 0x39)
+            highByte -= 0x37;
+        else
+            highByte -= 0x30;
+
+        if (lowByte > 0x39)
+            lowByte -= 0x37;
+        else
+            lowByte -= 0x30;
+
+        dest[i / 2] = (highByte << 4) | lowByte;
+    }
+    return;
 }
