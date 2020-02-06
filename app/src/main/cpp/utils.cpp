@@ -4,6 +4,8 @@
 
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
+#include <time.h>
 #include "utils.h"
 #include "log.h"
 
@@ -55,4 +57,18 @@ void hexstrToByte(const char *source, char *dest, int sourceLen) {
         dest[i / 2] = (highByte << 4) | lowByte;
     }
     return;
+}
+
+void randomKey(unsigned char key[]) {
+//    const char tableKey[] = "0123456789abcdefghijklmnopgrstuvwxyz";
+    const unsigned char tableKey[] = {0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+                             0x38, 0x39, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66,
+                             0x67, 0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e,
+                             0x6f, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76,
+                             0x77, 0x78, 0x79, 0x7a};
+    // 设置种子
+    srandom(time(NULL));
+    for (int i = 0; i < 16; i++) {
+        key[i] = tableKey[random() % 36];
+    }
 }

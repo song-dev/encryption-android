@@ -11,4 +11,6 @@ void print_long_data(char *s);
 
 void hexstrToByte(const char *source, char *dest, int sourceLen);
 
+void randomKey(unsigned char key[]);
+
 #endif //ENCRYPTION_ANDROID_UTILS_H

@@ -13,10 +13,6 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
 
-        String data = "sssss";
-        System.out.println(data.indexOf("."));
-        String substring = data.substring(0, -1);
-        System.out.println("substring: "+substring+"==length: "+substring.length());
         assertEquals(4, 2 + 2);
     }
 }
