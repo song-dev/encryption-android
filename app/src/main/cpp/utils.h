@@ -11,6 +11,10 @@ void print_long_data(char *s);
 
 void hexstrToByte(const char *source, char *dest, int sourceLen);
 
+void byteToHexstr(const char *source, char *dest, int sourceLen);
+
+void tohex(unsigned char *in, char *out, size_t insz);
+
 void randomKey(unsigned char key[]);
 
 #endif //ENCRYPTION_ANDROID_UTILS_H

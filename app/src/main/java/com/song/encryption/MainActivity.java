@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setDebug(true);
+        setDebug(false);
 
         // Example of a call to a native method
         final TextView tv = findViewById(R.id.sample_text);
@@ -39,7 +39,20 @@ public class MainActivity extends AppCompatActivity {
                 sb.append("1234567890abcdefghijklmnopqrstuvwxyz");
                 data = geetest_enc(sb.toString().getBytes());
                 tv.setText(data);
+
                 Log.e(TAG, "encrypted: " + data);
+
+                String sm2_enc = geetest_sm2_enc();
+
+                Log.e(TAG, "sm2 enc: " + sm2_enc);
+
+                String sm4_enc = geetest_sm4_enc(sb.toString().getBytes());
+
+                Log.e(TAG, "sm4 encrypted: " + sm4_enc);
+
+                Log.e(TAG, "sm4 decrypted: " + geetest_sm4_dec(sm4_enc));
+
+                Log.e(TAG, "sm2 decrypted: " + geetest_sm2_dec(sm2_enc));
 
             }
         });
@@ -49,14 +62,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // base64 decode 然后截断最后 112 然后 base64encode
-                byte[] decode = org.bouncycastle.util.encoders.Base64.decode(data);
-                int len = decode.length - 112;
-                Log.e(TAG, "decrypted: len: " + len);
-                byte dest[] = new byte[len];
-                System.arraycopy(decode, 0, dest, 0, len);
-                String encode = new String(org.bouncycastle.util.encoders.Base64.encode(dest));
+//                byte[] decode = org.bouncycastle.util.encoders.Base64.decode(data);
+//                int len = decode.length - 112;
+//                Log.e(TAG, "decrypted: len: " + len);
+//                byte dest[] = new byte[len];
+//                System.arraycopy(decode, 0, dest, 0, len);
+//                String encode = new String(org.bouncycastle.util.encoders.Base64.encode(dest));
 
-                Log.e(TAG, "decrypted: " + geetest_dec(encode));
+                int len = data.length() - 112*2;
+                String s = data.substring(0,len);
+                Log.e(TAG, "decrypted: " + geetest_dec(s));
 
             }
         });
@@ -77,5 +92,13 @@ public class MainActivity extends AppCompatActivity {
     public native String geetest_dec(String data);
 
     public native void setDebug(boolean debug);
+
+    public native String geetest_sm2_enc();
+
+    public native String geetest_sm2_dec(String data);
+
+    public native String geetest_sm4_enc(byte[] data);
+
+    public native String geetest_sm4_dec(String data);
 
 }

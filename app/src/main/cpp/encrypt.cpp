@@ -49,7 +49,7 @@ int sm2_encrypto(DP_BYTES data, DP_BYTES publicKey, unsigned char *enc_out) {
     return ENCRYPT_OK;
 }
 
-unsigned char *test_sm2_decrypto(struct DP_BYTES cipherText, struct DP_BYTES privateKey) {
+int test_sm2_decrypto(struct DP_BYTES cipherText, struct DP_BYTES privateKey, char out[]) {
 
     //密文长度至少也需要64+32位
     if (cipherText.length < LENGTH_SM2_ENC || privateKey.length == 0) {
@@ -76,10 +76,12 @@ unsigned char *test_sm2_decrypto(struct DP_BYTES cipherText, struct DP_BYTES pri
     LOGD("ret: %d", ret);
     if (out_len == 0 || ret != MP_OKAY) {
         //解密出错了
-        return NULL;
+        return ret;
     }
 
-    return result;
+    memcpy(out, result, out_len);
+
+    return ret;
 }
 
 /**
@@ -143,11 +145,6 @@ int sm2_encrypt(unsigned char *sm4_key, char *out) {
 
     return result_code;
 
-//    struct DP_BYTES sm2CipherTextC = {};
-//    sm2CipherTextC.data = (char *) data_enc;
-//    sm2CipherTextC.length = len_enc;
-//    unsigned char *result = test_sm2_decrypto(sm2CipherTextC, privateKeyC);
-
 }
 
 
@@ -195,28 +192,39 @@ jstring encrypt(JNIEnv *env, jbyteArray data_, unsigned char *uKey) {
 //        LOGD("out: %02x", out[i]);
 //    }
 
-    int len_sm4 = strlen((char *) uKey);
-    LOGE("len_sm4: %d",len_sm4);
+    // base64 sm4_enc
+    char *b64_sm4 = b64_encode(out, len_ext);
+    LOGE("encrypted sm4 base64 length: %d", strlen(b64_sm4));
+    int len_sm4 = strlen(b64_sm4);
 
-    int len_sm2 = len_sm4 + LENGTH_SM2_ENC;
+    // sm2 加密
+    int len_sm4_key = strlen((char *) uKey);
+    LOGE("len_sm4_key: %d", len_sm4_key);
+    int len_sm2 = len_sm4_key + LENGTH_SM2_ENC;
     char sm2_out[len_sm2];
     sm2_encrypt(uKey, sm2_out);
 
+    // hex sm2
+    int len_hex = len_sm2 * 2 + 1;
+    char sm2_hex[len_hex];
+    tohex((unsigned char *) sm2_out, sm2_hex, len_sm2);
+    sm2_hex[len_hex - 1] = '\0';
+
     // 拼接加密后数据和 sm2 加密后 key
-    unsigned char end[len_ext + len_sm2];
-    memcpy(end, out, len_ext);
-    memcpy(end + len_ext, sm2_out, len_sm2);
+    char end[len_sm4 + len_hex];
+    memcpy(end, b64_sm4, len_sm4);
+    memcpy(end + len_sm4, sm2_hex, len_hex);
 
-    LOGE("encrypted length: %d", len_ext + len_sm2);
-    LOGE("encrypted len_ext: %d", len_ext);
-    LOGE("encrypted len_sm2: %d", len_sm2);
-
-    // base64 编码处理
-    char *b64_end = b64_encode(end, len_ext + len_sm2);
-    LOGE("encrypted base64 length: %d", strlen(b64_end));
+//    LOGE("encrypted length: %d", len_ext + len_sm2);
+//    LOGE("encrypted len_ext: %d", len_ext);
+//    LOGE("encrypted len_sm2: %d", len_sm2);
+//
+//    // base64 编码处理
+//    char *b64_end = b64_encode(end, len_ext + len_sm2);
+//    LOGE("encrypted base64 length: %d", strlen(b64_end));
 
     env->ReleaseByteArrayElements(data_, in, 0);
-    return env->NewStringUTF(b64_end);
+    return env->NewStringUTF(end);
 
 }
 
@@ -246,7 +254,7 @@ jstring decrypt(JNIEnv *env, jstring data_, unsigned char *sm4key) {
 //    }
 
     unsigned char iv[] = {0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
-                             0x30, 0x30, 0x30, 0x30, 0x30};
+                          0x30, 0x30, 0x30, 0x30, 0x30};
     unsigned char decData[len_ext];
     sms4_key_t key;
     sms4_set_decrypt_key(&key, sm4key);
@@ -267,5 +275,197 @@ jstring decrypt(JNIEnv *env, jstring data_, unsigned char *sm4key) {
 
     env->ReleaseStringUTFChars(data_, data);
     return env->NewStringUTF(data_origin);
+
+}
+
+/**
+ * sm4 加密
+ * @param env
+ * @param data_ 待加密数据
+ * @param uKey sm4 key
+ * @return 加密后 hexstring 格式数据
+ */
+jstring encrypt_sm4(JNIEnv *env, jbyteArray data_, unsigned char *uKey) {
+
+    // 待加密数据长度
+    jsize len_origin = env->GetArrayLength(data_);
+    // 转化为指针
+    jbyte *in = env->GetByteArrayElements(data_, JNI_FALSE);
+
+    // sm4 加密 data sm2 加密key 最终合并 base64处理
+    sms4_key_t key;
+    unsigned char iv[] = {0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
+                          0x30, 0x30, 0x30, 0x30, 0x30};
+    sms4_set_encrypt_key(&key, uKey);
+
+    int len_padding = AES_BLOCK_SIZE - len_origin % AES_BLOCK_SIZE;
+    int len_ext = len_origin + len_padding;
+    LOGE("ext data len: %d, padding len: %d, origin data len: %d", len_ext, len_padding,
+         len_origin);
+
+    uint8_t padding[len_padding];
+    memset(padding, len_padding, len_padding);
+
+    // 链接数据
+    uint8_t data_ext[len_ext];
+    memcpy((char *) data_ext, in, len_origin);
+    memcpy((char *) (data_ext + len_origin), (char *) padding, len_padding);
+    unsigned char out[len_ext];
+
+//    for (int i = 0; i < len_ext; ++i) {
+//        LOGD("origin: %02x", data_ext[i]);
+//    }
+
+    sms4_cbc_encrypt(data_ext, out, len_ext, &key, iv, 1);
+
+//    for (int i = 0; i < len_ext; ++i) {
+//        LOGD("out: %02x", out[i]);
+//    }
+
+    // bytes 转化为 hexstring
+    char out_hex[len_ext * 2 + 1];
+//    char temp[2];
+
+    // bytes 转化为 hexstring
+//    char out_hex[len_sm2 * 2 + 1];
+    tohex(out, out_hex, len_ext);
+
+//    for (int i = 0; i < len_ext; ++i) {
+//        sprintf(temp, "%02x", out[i]);
+//        memcpy(out_hex + i * 2, temp, 2);
+//    }
+    out_hex[len_ext * 2] = '\0';
+
+    env->ReleaseByteArrayElements(data_, in, 0);
+    return env->NewStringUTF(out_hex);
+
+}
+
+
+/**
+ * sm4 解密
+ * @param env
+ * @param data_ 待解密数据 hexstring 格式
+ * @return 解密后字符串
+ */
+jstring decrypt_sm4(JNIEnv *env, jstring data_, unsigned char *sm4key) {
+
+    const char *data = env->GetStringUTFChars(data_, JNI_FALSE);
+    jsize len_origin = env->GetStringUTFLength(data_);
+    LOGD("len: %d hex data: %s", len_origin, data);
+
+    // 传入 hexstring 字符串，解析为原数据
+    size_t len_ext = len_origin / 2;
+    unsigned char in[len_ext];
+    hexstrToByte(data, (char *) in, len_origin);
+
+    LOGD("len_ext: %zu len_origin: %zu", len_ext, len_origin);
+//    for (int i = 0; i < len_ext; ++i) {
+//        LOGD("dec in: %02x", in[i]);
+//    }
+
+    unsigned char iv[] = {0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
+                          0x30, 0x30, 0x30, 0x30, 0x30};
+    unsigned char decData[len_ext];
+    sms4_key_t key;
+    sms4_set_decrypt_key(&key, sm4key);
+    sms4_cbc_encrypt(in, decData, len_ext, &key, iv, 0);
+
+//    for (int i = 0; i < len_ext; ++i) {
+//        LOGD("decrypted: %c", decData[i]);
+//    }
+
+    // 去除padding
+    int padding_dec = decData[len_ext - 1];
+    int len_dec_data = len_ext - padding_dec;
+    char data_origin[len_dec_data + 1];
+    memcpy(data_origin, decData, len_dec_data);
+    data_origin[len_dec_data] = '\0';
+
+    LOGD("padding_dec: %d len_dec_data: %d", padding_dec, len_dec_data);
+
+    env->ReleaseStringUTFChars(data_, data);
+    return env->NewStringUTF(data_origin);
+
+}
+
+/**
+ * sm2 公钥加密
+ * @param env
+ * @param data_ 待加密数据
+ * @param uKey sm4 key
+ * @return 加密后 base64 数据
+ */
+jstring encrypt_sm2(JNIEnv *env, unsigned char *uKey) {
+
+    int len_sm4 = strlen((char *) uKey);
+    LOGE("len_sm4: %d", len_sm4);
+
+    int len_sm2 = len_sm4 + LENGTH_SM2_ENC;
+    char sm2_out[len_sm2];
+    sm2_encrypt(uKey, sm2_out);
+
+    // bytes 转化为 hexstring
+    char out_hex[len_sm2 * 2 + 1];
+//    byteToHexstr(sm2_out, out_hex, len_sm2);
+    tohex((unsigned char *) sm2_out, out_hex, len_sm2);
+
+//    char temp[2];
+//    for (int i = 0; i < len_sm2; ++i) {
+//        sprintf(temp, "%02x", sm2_out[i]);
+//        memcpy(out_hex + i * 2, temp, 2);
+//    }
+    out_hex[len_sm2 * 2] = '\0';
+    LOGE("sm2 enc: %s", out_hex);
+
+    return env->NewStringUTF(out_hex);
+
+}
+
+
+/**
+ * sm2 私钥解密
+ * @param env
+ * @param data_ 待解密数据
+ * @return 解密后字符串
+ */
+jstring decrypt_sm2(JNIEnv *env, jstring data_) {
+
+    const char *data = env->GetStringUTFChars(data_, JNI_FALSE);
+    jsize len_origin = env->GetStringUTFLength(data_);
+    LOGD("len: %d hex data: %s", len_origin, data);
+
+    // 传入 hexstring 字符串，解析为原数据
+    size_t len_ext = len_origin / 2;
+    char in[len_ext];
+    hexstrToByte(data, in, len_origin);
+
+    char priviteKey[] = "42c37b287a1c218d76112208cdbc4a5fc17dd0d2ef76ca06df63e652e4e660c6";
+
+    // 将hex转byte公钥和私钥
+    int len_pri = strlen(priviteKey);
+
+    char privateKeyLast[len_pri / 2];
+    hexstrToByte(priviteKey, privateKeyLast, len_pri);
+    len_pri = len_pri / 2;
+
+    // 输出转化后的bytes
+    LOGD("len_pri: %d", len_pri);
+
+    struct DP_BYTES privateKeyC = {};
+    privateKeyC.data = privateKeyLast;
+    privateKeyC.length = len_pri;
+
+    struct DP_BYTES sm2PlainStrC = {};
+    sm2PlainStrC.data = in;
+    sm2PlainStrC.length = len_ext;
+
+    char out[17];
+    test_sm2_decrypto(sm2PlainStrC, privateKeyC, out);
+    out[16] = '\0';
+    LOGE("sm2_dec result: %s", out);
+
+    env->ReleaseStringUTFChars(data_, data);
+    return env->NewStringUTF(out);
 
 }
