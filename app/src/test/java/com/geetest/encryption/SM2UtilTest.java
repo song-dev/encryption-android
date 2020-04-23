@@ -1,7 +1,7 @@
-package com.song.encryption;
+package com.geetest.encryption;
 
-import com.song.encryption.sm2.BCECUtil;
-import com.song.encryption.sm2.SM2Util;
+import com.geetest.encryption.sm2.BCECUtil;
+import com.geetest.encryption.sm2.SM2Util;
 
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;

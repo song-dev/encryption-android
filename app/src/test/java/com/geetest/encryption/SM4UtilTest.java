@@ -1,6 +1,6 @@
-package com.song.encryption;
+package com.geetest.encryption;
 
-import com.song.encryption.sm4.SM4Util;
+import com.geetest.encryption.sm4.SM4Util;
 
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.junit.Assert;
