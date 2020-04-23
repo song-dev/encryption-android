@@ -19,6 +19,8 @@
  * GM curve params
  */
 
+//#define _DEBUG
+
 #define SM2_P     "FFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000FFFFFFFFFFFFFFFF"
 #define SM2_A     "FFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000FFFFFFFFFFFFFFFC"
 #define SM2_B     "28E9FA9E9D9F5E344D5A9E4BCF6509A7F39789F515AB8F92DDBCBD414D940E93"
@@ -59,6 +61,7 @@ const char *Yg = SM2_G_Y;
 #include "stdlib.h"
 #include "string.h"
 #include "time.h"
+#include "../log.h"
 
 
 int myrng(unsigned char *dst, int len, void *dat)
@@ -629,20 +632,44 @@ int hexCharStr2unsignedCharStr(char *src, unsigned long lsrc, int flag, unsigned
 int Mp_Int2Byte(unsigned char *tar, unsigned long *lenTar, mp_int * mp_src)
 {
 	int ret = 0;
-	char buff[MAX_STRLEN] = {0};
+	int problemLength = 62;
+    int normalLength = 64;
+	int tempLength = 0;
+    char buff[MAX_STRLEN] = {0};
 	char tmp[MAX_STRLEN] = {0};
 	int  lenBuff = MAX_STRLEN;
 	ret = mp_toradix(mp_src, buff, 16);
 	CHECK_RET(ret);
 	lenBuff = strlen(buff);
-	if (0 != lenBuff%2) //if mp_toradix deleted the leading 0, add it(0) here!
-	{
-		tmp[0] = 0x30;
-		memcpy(tmp+1, buff, lenBuff);
-		memset(buff, 0x00, sizeof(buff));
-		memcpy(buff, tmp, lenBuff+1);
-		lenBuff += 1;
-	}
+//	if (0 != lenBuff%2) //if mp_toradix deleted the leading 0, add it(0) here!
+//	{
+//		tmp[0] = 0x30;
+//		memcpy(tmp+1, buff, lenBuff);
+//		memset(buff, 0x00, sizeof(buff));
+//		memcpy(buff, tmp, lenBuff+1);
+//		lenBuff += 1;
+//	}else if (lenBuff == problemLength)
+//	{
+//	    tmp[0] = 0x30;
+//	    tmp[1] = 0x30;
+//	    memcpy(tmp+2, buff, lenBuff);
+//	    memset(buff, 0x00, sizeof(buff));
+//	    memcpy(buff, tmp, lenBuff + 2);
+//	    lenBuff += 2;
+//	}
+
+// to add the lack bit, no matter how many they are
+	tempLength = normalLength - lenBuff;
+    if (tempLength != 0){
+        for (int i = 0; i < tempLength; ++i) {
+            tmp [i] = 0x30;
+        }
+        memcpy(tmp + tempLength, buff, lenBuff);
+        memset(buff, 0x00, sizeof(buff));
+        memcpy(buff, tmp, lenBuff + tempLength);
+        lenBuff += tempLength;
+    }
+
 	ret = hexCharStr2unsignedCharStr(buff, lenBuff, 0, tar, lenTar);
 
 END:
@@ -1538,6 +1565,7 @@ int GM_SM2Encrypt(unsigned char * encData, unsigned long * ulEncDataLen, unsigne
 		CHECK_RET(ret);
 #else
 		ret = genRand_k(&mp_rand_k, &mp_n);
+//        LOGE("MainActivity mp_rand_k = %d", MP_print(&mp_rand_k));
 		CHECK_RET(ret);
 #endif // _DEBUG	
 
@@ -1602,7 +1630,7 @@ int GM_SM2Encrypt(unsigned char * encData, unsigned long * ulEncDataLen, unsigne
 		ret = Mp_Int2Byte(tmpX2Buff, &tmpX2Len, &mp_x2);
 		CHECK_RET(ret);
 		ret = Mp_Int2Byte(tmpY2Buff, &tmpY2Len, &mp_y2);
-		CHECK_RET(ret);
+        CHECK_RET(ret);
 //		ptmp = new unsigned char [tmpX2Len * 3];
 		ptmp = (unsigned char*)malloc((tmpX2Len * 3)* sizeof(unsigned char));
 		if (NULL == ptmp)
@@ -1625,7 +1653,8 @@ int GM_SM2Encrypt(unsigned char * encData, unsigned long * ulEncDataLen, unsigne
 
 		// t= KDF(x2||y2, klen)
 		ret = KDFwithSm3(pout, ptmp, tmpX2Len+tmpY2Len, plainLen);// t = pout
-		CHECK_RET(ret);
+//        BYTE_print_android(pout, C2_len);
+        CHECK_RET(ret);
 #ifdef _DEBUG
 		MP_print_Space;
 		printf("KDF t=");

@@ -19,6 +19,11 @@ int test_sm2_decrypto(struct DP_BYTES cipherText, struct DP_BYTES privateKey, ch
 
 int sm2_encrypt(unsigned char *sm4_key, char *out);
 
+int sm2_encryptwithkey(unsigned char *sm4_key, char *out, char *sm2_key);
+
+
+jstring encryptWithKey(JNIEnv *env, jbyteArray data_, unsigned char *uKey, char *sm2_key);
+
 jstring encrypt(JNIEnv *env, jbyteArray data_, unsigned char *uKey);
 
 jstring decrypt(JNIEnv *env, jstring data_, unsigned char *sm4key);
