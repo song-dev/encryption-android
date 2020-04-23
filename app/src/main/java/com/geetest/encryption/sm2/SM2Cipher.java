@@ -1,4 +1,4 @@
-package com.song.encryption.sm2;
+package com.geetest.encryption.sm2;
 
 public class SM2Cipher {
     /**

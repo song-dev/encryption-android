@@ -1,4 +1,4 @@
-package com.song.encryption.sm4;
+package com.geetest.encryption.sm4;
 
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.engines.SM4Engine;

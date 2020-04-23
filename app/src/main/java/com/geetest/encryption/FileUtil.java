@@ -1,4 +1,4 @@
-package com.song.encryption;
+package com.geetest.encryption;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
