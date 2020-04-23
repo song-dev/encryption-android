@@ -128,6 +128,13 @@ add_library( # Sets the name of the library.
         sms2/bncore.c
         sms2/bn_mp_toradix.c
         sms2/bn_mp_radix_smap.c
+        json/cJSON.c
+        json/cJSON_Utils.c
+        aes/aes.c
+        base64/base64.c
+        sha256/sha256.c
+        blowfish/bf_enc.c
+        blowfish/bf_skey.c
         )
 
 # Searches for a specified prebuilt library and stores the path as a
