@@ -12,9 +12,18 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++11"
+                cppFlags "-fvisibility=hidden  -ffunction-sections -fdata-sections -std=c++11 -fno-rtti -fno-exceptions"
+//                arguments "-DANDROID_STL=c++_shared"
+                arguments "-DANDROID_STL=none"
+                cFlags "-fvisibility=hidden  -ffunction-sections -fdata-sections"
             }
+
+            ndk {
+                abiFilters "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
+            }
+
         }
+
     }
     buildTypes {
         release {
@@ -27,6 +36,10 @@ android {
             path "src/main/cpp/CMakeLists.txt"
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -36,4 +49,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+
+    implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.62'
+    implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.62'
+
 }
