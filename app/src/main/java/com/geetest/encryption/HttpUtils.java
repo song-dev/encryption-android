@@ -1,4 +1,4 @@
-package com.song.encryption;
+package com.geetest.encryption;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

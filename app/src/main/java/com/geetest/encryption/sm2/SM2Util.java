@@ -1,6 +1,6 @@
-package com.song.encryption.sm2;
+package com.geetest.encryption.sm2;
 
-import com.song.encryption.sm4.GMBaseUtil;
+import com.geetest.encryption.sm4.GMBaseUtil;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;

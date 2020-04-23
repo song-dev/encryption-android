@@ -1,4 +1,4 @@
-package com.song.encryption;
+package com.geetest.encryption;
 
 public class Gt3GMEncryption {
     /**

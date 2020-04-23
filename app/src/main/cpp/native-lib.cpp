@@ -31,7 +31,7 @@ char*   Jstring2CStr(JNIEnv*   env,   jstring   jstr)
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_song_encryption_Gt3GMEncryption_geetest_1enc(JNIEnv *env, jobject instance,
+Java_com_geetest_encryption_Gt3GMEncryption_geetest_1enc(JNIEnv *env, jobject instance,
                                                       jbyteArray data_, jstring SM2_key_) {
 
     // TODO
@@ -56,7 +56,7 @@ Java_com_song_encryption_Gt3GMEncryption_geetest_1enc(JNIEnv *env, jobject insta
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_song_encryption_Gt3GMEncryption_geetest_1dec(JNIEnv *env, jobject instance,
+Java_com_geetest_encryption_Gt3GMEncryption_geetest_1dec(JNIEnv *env, jobject instance,
                                                       jstring data_) {
     LOGD("decrypt key: %s", endKey);
     jstring result = decrypt(env, data_, endKey);
@@ -65,7 +65,7 @@ Java_com_song_encryption_Gt3GMEncryption_geetest_1dec(JNIEnv *env, jobject insta
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_song_encryption_Gt3GMEncryption_setDebug(JNIEnv *env, jobject instance, jboolean mDebug) {
+Java_com_geetest_encryption_Gt3GMEncryption_setDebug(JNIEnv *env, jobject instance, jboolean mDebug) {
 
     if (mDebug) {
         debug = 1;
@@ -77,7 +77,7 @@ Java_com_song_encryption_Gt3GMEncryption_setDebug(JNIEnv *env, jobject instance,
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_song_encryption_Gt3GMEncryption_geetest_1sm2_1enc(JNIEnv *env, jobject instance) {
+Java_com_geetest_encryption_Gt3GMEncryption_geetest_1sm2_1enc(JNIEnv *env, jobject instance) {
 
     LOGD("encrypt key: %s", endKey);
     return encrypt_sm2(env, endKey);
@@ -85,7 +85,7 @@ Java_com_song_encryption_Gt3GMEncryption_geetest_1sm2_1enc(JNIEnv *env, jobject 
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_song_encryption_Gt3GMEncryption_geetest_1sm2_1dec(JNIEnv *env, jobject instance,
+Java_com_geetest_encryption_Gt3GMEncryption_geetest_1sm2_1dec(JNIEnv *env, jobject instance,
                                                            jstring data_) {
     LOGD("decrypt key: %s", endKey);
     return decrypt_sm2(env, data_);
@@ -93,7 +93,7 @@ Java_com_song_encryption_Gt3GMEncryption_geetest_1sm2_1dec(JNIEnv *env, jobject 
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_song_encryption_Gt3GMEncryption_geetest_1sm4_1enc(JNIEnv *env, jobject instance,
+Java_com_geetest_encryption_Gt3GMEncryption_geetest_1sm4_1enc(JNIEnv *env, jobject instance,
                                                            jbyteArray data_) {
     unsigned char key[17];
     if (debug) {
@@ -115,7 +115,7 @@ Java_com_song_encryption_Gt3GMEncryption_geetest_1sm4_1enc(JNIEnv *env, jobject 
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_com_song_encryption_Gt3GMEncryption_geetest_1sm4_1dec(JNIEnv *env, jobject instance,
+Java_com_geetest_encryption_Gt3GMEncryption_geetest_1sm4_1dec(JNIEnv *env, jobject instance,
                                                            jstring data_) {
     return decrypt_sm4(env, data_, endKey);
 }
